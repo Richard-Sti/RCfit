@@ -13,8 +13,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 """Various constant and parameters use throughout the code."""
-
-# TODO: Convert to 1e10 Msun
 GNEWTON = 4.30091727e-06    # km^2 kpc Msun^(-1) s^-2
 RHO200C = 200 * 277.54      # Msun / kpc^3  (h = 1)
 LITTLE_H = 0.7

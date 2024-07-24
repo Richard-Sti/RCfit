@@ -12,7 +12,6 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-from .utils import SPARCReader                                                  # noqa
+from .utils import (SPARCReader, name2label)                                    # noqa
 from .model import (NFW_velocity_squared, gNFW_velocity_squared, RAR,           # noqa
-                    SPARC_independent)                                          # noqa
+                    SPARC_independent, BIC_from_samples)                        # noqa

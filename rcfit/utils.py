@@ -12,17 +12,12 @@
 # You should have received a copy of the GNU General Public License along
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-"""
-
-
-"""
+"""Various utilities."""
 import numpy as np
-from jax import numpy as jnp
 from h5py import File
+from jax import numpy as jnp
 
-
-from .params import RHO200C, LITTLE_H
-
+from .params import LITTLE_H, RHO200C
 
 ###############################################################################
 #                               Data IO                                       #
@@ -30,6 +25,9 @@ from .params import RHO200C, LITTLE_H
 
 
 class SPARCReader:
+    """
+    SPARC data reader. The SPARC data is assumed to be stored in a HDF5 file.
+    """
 
     def __init__(self, fname):
         self._fname = fname
@@ -61,8 +59,6 @@ class SPARCReader:
                         "e_Vobs", "gobs"]:
                 data[key] = jnp.array(f[f"{name}/{key}"][:])
 
-            # TODO: order data
-
             # Convert inclination to radians
             for key in ["inc", "e_inc"]:
                 data[key] = np.deg2rad(f[f"{name}/{key}"][0])
@@ -79,6 +75,8 @@ class SPARCReader:
 
 
 ###############################################################################
+#           Spherical overdensity mass to radius conversion                   #
+###############################################################################
 
 
 def M200c2R200c(M200c):
@@ -89,57 +87,27 @@ def M200c2R200c(M200c):
     return (3 * M200c / (4 * jnp.pi * RHO200C * LITTLE_H**2))**(1./3)
 
 
+###############################################################################
+#                           Plotting utitilies                                #
+###############################################################################
 
-def cumtrapezoid(y, x=None, dx=1.0, axis=-1):
-    """
-    Compute the cumulative trapezoidal integration of y with respect to x.
 
-    Parameters:
-    y : array_like
-        Values to integrate.
-    x : array_like, optional
-        The sample points corresponding to the y values. If x is None, the sample
-        points are assumed to be evenly spaced with spacing `dx`.
-    dx : scalar, optional
-        The spacing between sample points when `x` is None. Default is 1.0.
-    axis : int, optional
-        The axis along which to integrate. Default is the last axis.
+def name2label(name):
+    """Convert parameter names to LaTeX labels."""
+    x = {"L36": r"$L_{36}$",
+         "dist": r"$d$",
+         "inc": r"$i$",
+         "logM200c": r"$\log M_{200c}$",
+         "Ups_disk": r"$\Upsilon_{\rm disk}$",
+         "Ups_gas": r"$\Upsilon_{\rm gas}$",
+         "logc": r"$\log c$",
+         "a0": r"$a_0$",
+         "alpha": r"$\alpha$",
+         "beta": r"$\beta$",
+         "gamma": r"$\gamma$",
+         }
 
-    Returns:
-    y_int : ndarray
-        Cumulative trapezoidal integral of `y` along `axis`.
-    """
-    y = jnp.asarray(y)
-
-    if x is None:
-        d = dx
-    else:
-        x = jnp.asarray(x)
-        d = jnp.diff(x, axis=axis)
-
-    shape = list(y.shape)
-    shape[axis] = 1
-
-    slice1 = [slice(None)] * y.ndim
-    slice2 = [slice(None)] * y.ndim
-
-    slice1[axis] = slice(1, None)
-    slice2[axis] = slice(None, -1)
-
-    if x is None:
-        trapezoids = 0.5 * (y[tuple(slice1)] + y[tuple(slice2)]) * d
-    else:
-        trapezoids = 0.5 * (y[tuple(slice1)] + y[tuple(slice2)]) * d
-
-    # Prepend a zero to the cumulative sum to match the shape
-    initial = jnp.zeros(shape, dtype=trapezoids.dtype)
-    cumulative_integral = jnp.concatenate([initial, jnp.cumsum(trapezoids, axis=axis)], axis=axis)
-
-    return cumulative_integral
-
-# # Example usage:
-# y = jnp.array([1, 2, 3, 4, 5])
-# x = jnp.array([0, 1, 2, 3, 4])
-#
-# result = cumtrapezoid(y, x)
-# print(result)
+    try:
+        return x[name]
+    except KeyError:
+        return name
