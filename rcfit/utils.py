@@ -100,6 +100,7 @@ def name2label(name):
          "logM200c": r"$\log M_{200c}$",
          "Ups_disk": r"$\Upsilon_{\rm disk}$",
          "Ups_gas": r"$\Upsilon_{\rm gas}$",
+         "Ups_bulge": r"$\Upsilon_{\rm bulge}$",
          "logc": r"$\log c$",
          "a0": r"$a_0$",
          "alpha": r"$\alpha$",
